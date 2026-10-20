@@ -1,0 +1,39 @@
+@import url("https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap");
+
+@import "tailwindcss";
+
+@theme {
+  --font-oldenglish: "UnifrakturCook", serif;
+  --color-warm-beige: #E4DFD3;
+  --color-primary: #FF6A00;
+  --color-secondary: #FF8A26; 
+  --color-charcoal: #1C1C1C;
+}
+
+.nav-link {
+  @apply relative font-semibold;
+}
+
+.nav-link::before {
+  content: "";
+  @apply absolute left-0 -bottom-1 h-[3px] w-full bg-gray-900;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.nav-link:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.animateLoader{
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  animation: loader .5s linear infinite;
+}
+@keyframes loader {
+  to {
+    transform: rotate(306deg);
+  }
+}
