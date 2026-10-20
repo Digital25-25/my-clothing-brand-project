@@ -145,7 +145,7 @@ function Product(){
                                 <div className="flex gap-3">
                                     <button className="flex items-center cursor-pointer border py-2 px-4 rounded-lg text-neutral-600 bg-neutral-100 border-neutral-400 hover:bg-black hover:text-white hover:border-none hover:font-black" onClick={() => setCurrentPage(page => page - 1)} disabled={currentPage == 1}><ChevronLeft />  Previous</button>
                                     <div className="flex items-center">
-                                        {Array.from({length: totalPage}, (_, index) => <button key={index + 1} onClick={() => setCurrentPage(index + 1)} className="cursor-pointer font-bold py-2 px-4 text-blue-700 hover:bg-blue-700 hover:text-white ">{index + 1}</button>)}
+                                        {Array.from({length: totalPage}, (_, index) => <button key={index + 1} onClick={() => setCurrentPage(index + 1)} className="cursor-pointer font-bold py-2 px-4 text-blue-700 hover:bg-black hover:text-white rounded">{index + 1}</button>)}
                                     </div>   
                                     <button className="flex items-center cursor-pointer border py-2 px-4  rounded-lg text-neutral-600 bg-neutral-100 border-neutral-400 hover:bg-black hover:text-white hover:border-none hover:font-black" onClick={() => setCurrentPage(page => page + 1)} disabled={currentPage === totalPage}>Next <ChevronRight /></button>
                                 </div>
