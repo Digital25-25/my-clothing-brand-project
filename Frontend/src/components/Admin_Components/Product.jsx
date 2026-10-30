@@ -1,15 +1,20 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
-import { Search, Bell, User, Eye, SquarePen, Trash2, ChevronRight, ChevronLeft} from "lucide-react"
+import { Search, Bell, User, Eye, SquarePen, Trash2, ChevronRight, ChevronLeft, TriangleAlert} from "lucide-react"
 import { Link } from "react-router-dom"
 import { fetchProducts } from "../../redux/Action"
 import { fetchCategory } from "../../redux/Action"
+import api from "../../axio"
 function Product(){
     const [nameSearch, setNameSearch] = useState("")
     const [categorySearch, setCategorySearch] = useState("")
     const [currentPage, setCurrentPage] = useState(1)
+    const [deleteConfirmeDisplay, setDeleteConfirmeDisplay] = useState(false)
+    const [isDeleteConfirm, setIsDeleteConfirm] = useState(false)
+    const [selectedID, setSelectedID] = useState(null)
     const dispatch = useDispatch()
-
+    const navigate = useNavigate()
     // FETCHING OUR PRODUCTS AND CATEGORIES FROM OUR REDUX STORE
     useEffect(() => {
         dispatch(fetchProducts())
@@ -29,12 +34,34 @@ function Product(){
         return matchName && matchCategory
     })
 
-    // THIS FUNCTION WILL DISPLAY A PAGE SO THAT WE CAN VIEW A PROUDUCT CONTENT WITH DETAILS
-    const handleView = () => {}
-    // THIS FUNCTION WILL BE USE TO EDIT A PORDUCT
-    const handleEdit = () => {}
-    // THIS FUNCTION WILL BE USE TO DELETE A PROUDCT
-    const handleDelete = () => {}
+    // THIS FUNCTION WILL NAVIGATE TO THE VIEW PAGE WHERE WE WILL SEE THE FULL DETAIL OF THE PROD.
+    const handleView = (id) => {
+        navigate(`/u/admin/viewProduct/${id}`)
+    }
+    // THIS FUNCTION WILL NAVIGATE TO THE EDIT PRODUCT PAGE
+    const handleEdit = (id) => {
+        navigate(`/u/admin/editProduct/${id}`)
+        console.log("hello")
+    }
+    // THIS FUNCTION WILL BE USE TO DISPLAY A CONFIRMATION TO DELETE A PRODUCT
+    const handleDeleteConfirmationDisplay = (id) => {
+        setDeleteConfirmeDisplay(true)
+        setSelectedID(id)
+    }
+    // THIS FUNCTION WILL BE USE TO EXECUTE THE DELETION OF A PRODUCT
+    const handleDelete = async() => {
+        setIsDeleteConfirm(true)
+        if(selectedID === null) return
+        try{
+            /* API DELETION HERE */
+            await api.delete(`/products/destroy/${selectedID}`)
+            dispatch(fetchProducts())
+            setDeleteConfirmeDisplay(false)
+            setIsDeleteConfirm(false)
+        }catch(err){
+            console.log(err.response.data)
+        }
+    }
     //BACKGROUND COLORS FOR THE CATEGORY
     const categoryColors = {
         "T-shirts": "bg-blue-100 text-blue-950 font-bold px-2 py-1 rounded-lg",
@@ -56,12 +83,12 @@ function Product(){
         <div className="ml-5">
              {/* Head Section */}
             <section className="mb-4">
-                <div className="flex justify-between shadow-2xs pb-2 items-center">
+                <div className="flex justify-end shadow-2xs pb-2 items-center">
 {/*                     <div className="mr-10 relative">
                         <button className="absolute left-3 top-1/2 -translate-y-1/2 cursor-pointer"><Search size={17}/></button>
                         <input className="border border-neutral-300 px-3 py-1 pl-10 rounded-lg bg-white w-full focus:outline-none focus:ring-1 focus:ring-neutral-500"   placeholder="Search products..."/>
                     </div> */}
-                    <div></div>
+                    {/* A div was removed and the flex justify-between was changed to justify-end*/}
                     <div className="flex gap-4">
                         <button className="cursor-pointer "><Bell /></button>
                         <button className="border bg-white border-neutral-500 cursor-pointer rounded-full p-2"><User /></button>
@@ -121,9 +148,9 @@ function Product(){
                                     <td className="px-4 py-3 text-sm">{product.is_active == 1 ? <span className="text-green-500 font-bold bg-green-100 py-1.5 px-2 rounded-2xl flex items-center justify-center gap-2"><div className="rounded bg-green-500 w-2 h-2"></div>Active</span> : <span className="text-red-500 font-bold bg-red-100 py-1.5 px-2 rounded-2xl flex items-center justify-center gap-2"><div className="rounded bg-red-500 w-2 h-2"></div>Inactive</span>}</td>
                                     <td className="px-4 py-3">
                                         <div className="flex gap-4">
-                                            <button type="button" onChange={handleView} className="border border-neutral-400 p-2 rounded cursor-pointer hover:bg-black hover:text-white"><Eye size={16}/></button>
-                                            <button type="button" onChange={handleEdit} className="border border-blue-400 p-2 rounded cursor-pointer hover:bg-blue-600 hover:text-white"><SquarePen size={16}/></button>
-                                            <button type="button" onChange={handleDelete} className="border border-red-400 p-2 rounded cursor-pointer text-red-600 hover:bg-red-600 hover:text-white"><Trash2 size={16}/></button>
+                                            <button type="button" onClick={() => handleView(product.id)} className="border border-neutral-400 p-2 rounded cursor-pointer hover:bg-black hover:text-white"><Eye size={16}/></button>
+                                            <button type="button" onClick={() => handleEdit(product.id)} className="border border-blue-400 p-2 rounded cursor-pointer hover:bg-blue-600 hover:text-white"><SquarePen size={16}/></button>
+                                            <button type="button" onClick={() => handleDeleteConfirmationDisplay(product.id)} className="border border-red-400 p-2 rounded cursor-pointer text-red-600 hover:bg-red-600 hover:text-white"><Trash2 size={16}/></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -154,12 +181,33 @@ function Product(){
                         </tr>
                     </tfoot>
                 </table>
+                {/* A pop-up page for confirming a delete */}
+                <article className="relative">
+                    <div className={deleteConfirmeDisplay ? "pointer-events-none" : ""}></div>
+                    {deleteConfirmeDisplay && <div className="fixed inset-0 bg-black/40 z-40"></div>}
+                    {deleteConfirmeDisplay && (
+                        <div className="fixed bg-white rounded-lg shadow-xl p-6 z-50 left-[55%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] flex justify-center flex-col items-center">
+                            <h1 className="font-extrabold text-2xl mb-4">DELETE PRODUCT</h1>
+                            <p className="font-semibold text-lg mb-4">Are you sure you want to delete this product?</p>
+                            <div className="bg-red-100 p-4 border-l-9 border-red-400">
+                                <h3 className="flex gap-2 items-center font-black text-red-600 text-lg"><TriangleAlert color="red" size={24}/> Warning</h3>
+                                <p className="text-sm font-semibold text-red-800">This action cannot be undone. All values associated with this item will be deleted.</p>
+                            </div>
+                            <div className="mt-4 w-full flex justify-between">
+                                <button onClick={() => setDeleteConfirmeDisplay(false)} className="border bg-black text-white hover:text-neutral-300 font-semibold p-3 cursor-pointer">No, Cancel</button>
+                                <button onClick={handleDelete} className="border bg-white font-semibold p-3 cursor-pointer hover:bg-red-500 hover:text-white ">Yes, Delete</button>
+                            </div>
+                        </div>
+                    )}
+                </article>
             </section>
         </div>
         /* inProgress:
                 *   Work on the search category ---------------------------- DONE
                 *   Pagination --------------------------------------------- DONE ------ (IMPROVED BY ADDING AN ECLIPSE BUTTON).
                 *   Work on the action buttons 
+                *   DELETE ACTION >>>> We are doing the delete like this, we will ask for confirmation first, if the user clicks yes, we will execute with the delete --- DONE.
+                *   UPDATE ACTION >>>> 
          */
     )
 }
