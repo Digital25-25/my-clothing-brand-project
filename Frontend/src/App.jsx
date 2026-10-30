@@ -9,6 +9,8 @@ import AddProduct from "./components/Admin_Components/AddProduct"
 import Category from "./components/Admin_Components/Category"
 import AddCategory from "./components/Admin_Components/AddCategory"
 import EditCategory from "./components/Admin_Components/EditCategory"
+import EditProuduct from "./components/Admin_Components/EditProduct"
+import ViewProuduct from "./components/Admin_Components/ViewProduct"
 
 function App() {
 
@@ -25,6 +27,8 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="product" element={<Product />} />
           <Route path="addProduct" element={<AddProduct />} />
+          <Route path="editProduct/:id" element={<EditProuduct />} />
+          <Route path="viewProduct/:id" element={<ViewProuduct />} />
           <Route path="category" element={<Category />} />
           <Route path="addCategory" element={<AddCategory />} />
           <Route path="category/:id" element={<EditCategory />} />
